@@ -1,0 +1,7 @@
+{
+  "name": "AI Assessment Practice Tool",
+  "description": "A low-latency educational practice system that uses Gemini to interpret and answer various types of digital assessment items captured from the screen. It provides stabilized, high-confidence answers and instructional hints for interactive tasks.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
