@@ -16,6 +16,8 @@ export type LlmAnswer = {
   confidence: number;   // 0..1
   instruction: string;  // ≤15 words, short hint (empty if simple MCQ/numeric)
   justification: string;// brief reason, used only for logs/audit
+  questionText?: string; // full text of the question (for vision analysis)
+  options?: { id: string; text: string }[]; // answer options (for vision analysis)
 };
 
 export type Vote = LlmAnswer & { ts: number };

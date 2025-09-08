@@ -1,13 +1,38 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useAssessmentOrchestrator } from './hooks/useAssessmentOrchestrator';
 import { StatusIndicator } from './components/StatusIndicator';
 import { FinalizedAnswer } from './components/FinalizedAnswer';
+import { WebcamSelector } from './components/WebcamSelector';
+import { Teleprompter } from './components/Teleprompter';
 import type { AppEvent } from './types';
 
 const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<'main' | 'teleprompter'>('main');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { event, isCapturing, toggleCapture } = useAssessmentOrchestrator({ videoRef });
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const { event, isCapturing, toggleCapture } = useAssessmentOrchestrator({ videoRef, selectedDeviceId });
+
+  // Simple URL-based routing
+  useEffect(() => {
+    const checkRoute = () => {
+      const path = window.location.pathname + window.location.search;
+      if (path.includes('teleprompter')) {
+        setCurrentPage('teleprompter');
+      } else {
+        setCurrentPage('main');
+      }
+    };
+
+    checkRoute();
+    window.addEventListener('popstate', checkRoute);
+    return () => window.removeEventListener('popstate', checkRoute);
+  }, []);
+
+  // If teleprompter route, show teleprompter page
+  if (currentPage === 'teleprompter') {
+    return <Teleprompter />;
+  }
 
   const renderContent = (e: AppEvent) => {
     switch (e.type) {
@@ -44,19 +69,38 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={toggleCapture}
-          className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-gray-800 ${
-            isCapturing
-              ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
-              : 'bg-green-500 hover:bg-green-600 focus:ring-green-400 text-gray-900'
-          }`}
-        >
-          {isCapturing ? 'Stop Capture' : 'Start Capture'}
-        </button>
+        <div className="flex flex-col items-center space-y-4">
+          <WebcamSelector
+            selectedDeviceId={selectedDeviceId}
+            onDeviceSelect={setSelectedDeviceId}
+            disabled={isCapturing}
+          />
+          
+          <button
+            onClick={toggleCapture}
+            className={`px-8 py-3 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-offset-gray-800 ${
+              isCapturing
+                ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
+                : 'bg-green-500 hover:bg-green-600 focus:ring-green-400 text-gray-900'
+            }`}
+          >
+            {isCapturing ? 'Stop Capture' : 'Start Capture'}
+          </button>
+        </div>
       </div>
-      <footer className="text-center mt-8 text-gray-500 text-sm">
+      <footer className="text-center mt-8 text-gray-500 text-sm space-y-2">
         <p>This is a training and experimentation tool. Not for use in real exams.</p>
+        <div className="pt-2 border-t border-gray-700">
+          <a 
+            href="?teleprompter" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 underline text-sm"
+          >
+            📱 Open Teleprompter (Mobile)
+          </a>
+          <p className="text-xs text-gray-600 mt-1">Open this link on another device for mobile teleprompter view</p>
+        </div>
       </footer>
     </div>
   );

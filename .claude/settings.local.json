@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(yarn install)",
+      "Bash(yarn add tesseract.js)",
+      "WebSearch",
+      "WebFetch(domain:ai.google.dev)",
+      "Bash(yarn remove:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
